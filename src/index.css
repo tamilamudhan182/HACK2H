@@ -368,3 +368,29 @@ button {
 .app-shell--large-text p {
   font-size: 1.25rem !important;
 }
+
+/* Skip-to-content link for keyboard accessibility */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  background: #ffffff;
+  color: #000000;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.9rem;
+  z-index: 9999;
+  transition: top 0.2s ease;
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 16px;
+}
+
+/* Keyboard focus ring visible on all interactive elements */
+:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 3px;
+  border-radius: 4px;
+}

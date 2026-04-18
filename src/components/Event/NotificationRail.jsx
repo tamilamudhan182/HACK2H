@@ -1,6 +1,20 @@
-function NotificationRail({ alerts }) {
+import { memo } from "react";
+
+/**
+ * NotificationRail — live alert feed with severity-toned cards.
+ * Uses aria-live="polite" so screen readers announce new alerts.
+ *
+ * @param {{ alerts: Array }} props
+ */
+const NotificationRail = memo(function NotificationRail({ alerts }) {
   return (
-    <div className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-3)" }}>
+    <div
+      className="fade-in"
+      role="log"
+      aria-live="polite"
+      aria-label="Live event alerts"
+      style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-3)" }}
+    >
       <h2 style={{ fontSize: "1.5rem", marginBottom: "8px" }}>Live Alerts</h2>
 
       {alerts.map((alert, index) => {
@@ -21,6 +35,8 @@ function NotificationRail({ alerts }) {
           <div
             key={alert.id}
             className="panel-card fade-in"
+            role="article"
+            aria-label={`${alert.tone} alert: ${alert.title}`}
             style={{
               animationDelay: `${index * 0.1}s`,
               background: bg,
@@ -36,12 +52,17 @@ function NotificationRail({ alerts }) {
               }}
             >
               <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                {alert.tone === "urgent" && <span>🚨</span>}
-                {alert.tone === "warning" && <span>⚠️</span>}
-                {alert.tone === "info" && <span>ℹ️</span>}
+                {alert.tone === "urgent" && <span aria-hidden="true">🚨</span>}
+                {alert.tone === "warning" && <span aria-hidden="true">⚠️</span>}
+                {alert.tone === "info" && <span aria-hidden="true">ℹ️</span>}
                 <strong style={{ fontSize: "1.1rem", color: "#fff" }}>{alert.title}</strong>
               </div>
-              <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>{alert.timestamp}</span>
+              <time
+                style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}
+                aria-label={`Alert received at ${alert.timestamp}`}
+              >
+                {alert.timestamp}
+              </time>
             </div>
             <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "0.95rem", lineHeight: "1.5" }}>{alert.message}</p>
           </div>
@@ -49,6 +70,6 @@ function NotificationRail({ alerts }) {
       })}
     </div>
   );
-}
+});
 
 export default NotificationRail;

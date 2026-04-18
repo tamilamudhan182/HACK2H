@@ -1,7 +1,10 @@
-import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { EventProvider, useEvent } from "./context/EventContext";
+import { AuthProvider } from "./context/AuthContext";
+import AuthGuard from "./components/AuthGuard";
 import Navigation from "./components/Navigation";
+import { trackPageView } from "./services/analytics";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const WalletPage = lazy(() => import("./pages/WalletPage"));
@@ -10,16 +13,35 @@ const QueuePage = lazy(() => import("./pages/QueuePage"));
 const LocatorPage = lazy(() => import("./pages/LocatorPage"));
 const AlertsPage = lazy(() => import("./pages/AlertsPage"));
 
+/** Tracks page views on every route change via Google Analytics. */
+function AnalyticsTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    const titles = {
+      "/": "Home",
+      "/wallet": "Wallet",
+      "/heatmap": "Heatmap",
+      "/queue": "Queue",
+      "/locator": "Locator",
+      "/alerts": "Alerts",
+    };
+    trackPageView(location.pathname, titles[location.pathname] ?? location.pathname);
+  }, [location]);
+  return null;
+}
+
 function AppContent() {
   const { settings } = useEvent();
 
   return (
     <main
+      id="main-content"
       className={`app-shell${settings.highContrast ? " app-shell--high-contrast" : ""}${
         settings.largeText ? " app-shell--large-text" : ""
       }`}
     >
-      <Suspense fallback={<div className="loading-skeleton fade-in">Loading component mapping...</div>}>
+      <AnalyticsTracker />
+      <Suspense fallback={<div className="loading-skeleton fade-in">Loading…</div>}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/wallet" element={<WalletPage />} />
@@ -36,11 +58,24 @@ function AppContent() {
 
 function App() {
   return (
-    <EventProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </EventProvider>
+    <AuthProvider>
+      <EventProvider>
+        <BrowserRouter>
+          {/* Skip-to-content link for keyboard users */}
+          <a
+            href="#main-content"
+            className="skip-link"
+            onFocus={(e) => (e.target.style.top = "0")}
+            onBlur={(e) => (e.target.style.top = "-100px")}
+          >
+            Skip to main content
+          </a>
+          <AuthGuard>
+            <AppContent />
+          </AuthGuard>
+        </BrowserRouter>
+      </EventProvider>
+    </AuthProvider>
   );
 }
 
