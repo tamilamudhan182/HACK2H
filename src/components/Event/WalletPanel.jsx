@@ -1,8 +1,18 @@
-function WalletPanel({ attendee, wallet, settings, onAddMoney, onBuyPass, onToggleSetting }) {
+import { memo } from "react";
+import GooglePayButton from "../GooglePayButton";
+
+/**
+ * WalletPanel — displays the unified QR wallet card, quick action buttons,
+ * transaction history, and accessibility settings.
+ *
+ * @param {{ attendee: Object, wallet: Object, settings: Object, onAddMoney: Function, onBuyPass: Function, onToggleSetting: Function }} props
+ */
+const WalletPanel = memo(function WalletPanel({ attendee, wallet, settings, onAddMoney, onBuyPass, onToggleSetting }) {
   return (
     <div className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-4)" }}>
       {/* The Physical Card */}
       <section
+        aria-label="Digital access pass card"
         style={{
           background: "linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02))",
           borderRadius: "var(--radius-lg)",
@@ -14,8 +24,9 @@ function WalletPanel({ attendee, wallet, settings, onAddMoney, onBuyPass, onTogg
           backdropFilter: "blur(24px)",
         }}
       >
-        {/* Holographic effect */}
+        {/* Holographic accent */}
         <div
+          aria-hidden="true"
           style={{
             position: "absolute",
             top: 0,
@@ -26,7 +37,7 @@ function WalletPanel({ attendee, wallet, settings, onAddMoney, onBuyPass, onTogg
             filter: "blur(30px)",
             opacity: 0.5,
           }}
-        ></div>
+        />
 
         <div
           style={{
@@ -48,11 +59,17 @@ function WalletPanel({ attendee, wallet, settings, onAddMoney, onBuyPass, onTogg
             >
               Digital Access Pass
             </p>
-            <h2 style={{ fontSize: "2.2rem", marginTop: "8px", textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
+            <h2
+              style={{ fontSize: "2.2rem", marginTop: "8px", textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}
+              aria-label={`Wallet balance: ${wallet.balance.toFixed(2)} Indian Rupees`}
+            >
               INR {wallet.balance.toFixed(2)}
             </h2>
           </div>
+          {/* Mock QR Code */}
           <div
+            role="img"
+            aria-label="QR code for wallet access"
             style={{
               background: "#fff",
               padding: "8px",
@@ -63,12 +80,8 @@ function WalletPanel({ attendee, wallet, settings, onAddMoney, onBuyPass, onTogg
               boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
             }}
           >
-            {/* Mock QR Code */}
             {[...Array(9)].map((_, i) => (
-              <div
-                key={i}
-                style={{ width: "8px", height: "8px", background: i % 2 === 0 ? "#000" : "transparent" }}
-              ></div>
+              <div key={i} style={{ width: "8px", height: "8px", background: i % 2 === 0 ? "#000" : "transparent" }} />
             ))}
           </div>
         </div>
@@ -97,23 +110,43 @@ function WalletPanel({ attendee, wallet, settings, onAddMoney, onBuyPass, onTogg
 
       {/* Quick Actions */}
       <section
+        aria-label="Wallet quick actions"
         className="wallet-actions"
         style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-3)" }}
       >
-        <button className="btn-primary" onClick={() => onAddMoney("UPI", 500)}>
+        <button
+          id="btn-add-upi"
+          className="btn-primary"
+          onClick={() => onAddMoney("UPI", 500)}
+          aria-label="Add 500 Indian Rupees via UPI"
+        >
           + Add INR 500
         </button>
-        <button className="btn-secondary" onClick={() => onBuyPass()}>
+        <button
+          id="btn-buy-metro-pass"
+          className="btn-secondary"
+          onClick={onBuyPass}
+          aria-label="Buy Metro Express pass for 140 Indian Rupees"
+        >
           Buy Metro Pass
         </button>
       </section>
 
+      {/* Google Pay */}
+      <GooglePayButton amount={500} onSuccess={onAddMoney} />
+
       {/* Transaction History */}
       <h3 style={{ marginTop: "var(--spacing-3)" }}>Recent Activity</h3>
-      <section style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-2)" }}>
+      <section
+        role="list"
+        aria-label="Recent wallet transactions"
+        style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-2)" }}
+      >
         {wallet.history.map((tx) => (
           <div
             key={tx.id}
+            role="listitem"
+            aria-label={`${tx.label}, ${tx.type === "credit" ? "credited" : "debited"} ${Math.abs(tx.amount)} rupees at ${tx.timestamp}`}
             className="panel-card"
             style={{
               padding: "var(--spacing-3)",
@@ -140,68 +173,55 @@ function WalletPanel({ attendee, wallet, settings, onAddMoney, onBuyPass, onTogg
         ))}
       </section>
 
-      {/* Settings */}
+      {/* Accessibility Settings */}
       <h3 style={{ marginTop: "var(--spacing-3)" }}>Settings</h3>
-      <section className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-3)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontWeight: "500" }}>High Contrast Mode</span>
-          <button
-            onClick={() => onToggleSetting("highContrast")}
-            style={{
-              width: "48px",
-              height: "28px",
-              background: settings.highContrast ? "var(--color-primary)" : "rgba(255,255,255,0.1)",
-              borderRadius: "14px",
-              position: "relative",
-              transition: "all 0.3s",
-            }}
-          >
-            <div
+      <section
+        className="panel-card"
+        aria-label="Accessibility settings"
+        style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-3)" }}
+      >
+        {[
+          { key: "highContrast", label: "High Contrast Mode" },
+          { key: "largeText", label: "Large Text" },
+          { key: "voiceAlerts", label: "Voice Alerts for Emergencies" },
+        ].map(({ key, label }) => (
+          <div key={key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontWeight: "500" }}>{label}</span>
+            <button
+              id={`toggle-${key}`}
+              role="switch"
+              aria-checked={settings[key]}
+              aria-label={`${label}: ${settings[key] ? "on" : "off"}`}
+              onClick={() => onToggleSetting(key)}
               style={{
-                position: "absolute",
-                top: "4px",
-                left: settings.highContrast ? "24px" : "4px",
-                width: "20px",
-                height: "20px",
-                background: "#fff",
-                borderRadius: "50%",
-                transition: "left 0.3s",
-                boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                width: "48px",
+                height: "28px",
+                background: settings[key] ? "var(--color-primary)" : "rgba(255,255,255,0.1)",
+                borderRadius: "14px",
+                position: "relative",
+                transition: "all 0.3s",
               }}
-            ></div>
-          </button>
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontWeight: "500" }}>Large Text</span>
-          <button
-            onClick={() => onToggleSetting("largeText")}
-            style={{
-              width: "48px",
-              height: "28px",
-              background: settings.largeText ? "var(--color-primary)" : "rgba(255,255,255,0.1)",
-              borderRadius: "14px",
-              position: "relative",
-              transition: "all 0.3s",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: "4px",
-                left: settings.largeText ? "24px" : "4px",
-                width: "20px",
-                height: "20px",
-                background: "#fff",
-                borderRadius: "50%",
-                transition: "left 0.3s",
-                boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-              }}
-            ></div>
-          </button>
-        </div>
+            >
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  top: "4px",
+                  left: settings[key] ? "24px" : "4px",
+                  width: "20px",
+                  height: "20px",
+                  background: "#fff",
+                  borderRadius: "50%",
+                  transition: "left 0.3s",
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                }}
+              />
+            </button>
+          </div>
+        ))}
       </section>
     </div>
   );
-}
+});
 
 export default WalletPanel;

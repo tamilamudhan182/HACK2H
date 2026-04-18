@@ -6,5 +6,9 @@ module.exports = {
   },
   transform: {
     "^.+\\.(js|jsx)$": "babel-jest"
-  }
+  },
+  globals: {
+    "import.meta": { env: {} }
+  },
+  transformIgnorePatterns: ["node_modules/(?!(your-esm-package)/)"]
 };

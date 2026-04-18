@@ -1,0 +1,43 @@
+steps:
+  # Step 1: Build Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - "-t"
+      - "gcr.io/$PROJECT_ID/smart-event-companion:$COMMIT_SHA"
+      - "-t"
+      - "gcr.io/$PROJECT_ID/smart-event-companion:latest"
+      - "."
+
+  # Step 2: Push to Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - "gcr.io/$PROJECT_ID/smart-event-companion:$COMMIT_SHA"
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - "gcr.io/$PROJECT_ID/smart-event-companion:latest"
+
+  # Step 3: Deploy to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - smart-event-companion
+      - "--image=gcr.io/$PROJECT_ID/smart-event-companion:$COMMIT_SHA"
+      - "--platform=managed"
+      - "--region=asia-south1"
+      - "--allow-unauthenticated"
+      - "--memory=256Mi"
+      - "--cpu=1"
+      - "--max-instances=10"
+
+images:
+  - "gcr.io/$PROJECT_ID/smart-event-companion:$COMMIT_SHA"
+  - "gcr.io/$PROJECT_ID/smart-event-companion:latest"
+
+options:
+  logging: CLOUD_LOGGING_ONLY

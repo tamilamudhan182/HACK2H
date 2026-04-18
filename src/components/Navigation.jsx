@@ -11,7 +11,7 @@ function Navigation() {
   ];
 
   return (
-    <nav className="nav-dock">
+    <nav className="nav-dock" role="navigation" aria-label="Main navigation">
       {tabs.map((tab) => (
         <NavLink key={tab.to} to={tab.to} className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
           <span style={{ fontSize: "1.25rem", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.5))" }}>{tab.icon}</span>

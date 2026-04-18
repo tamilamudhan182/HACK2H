@@ -11,7 +11,11 @@ import { trackEvent } from "../services/analytics";
 
 function GooglePayButton({ amount = 500, onSuccess }) {
   const [processing, setProcessing] = useState(false);
-  const merchantId = import.meta.env.VITE_GOOGLE_PAY_MERCHANT_ID ?? null;
+  // import.meta.env is Vite-only — guard against test environments
+  const merchantId =
+    typeof import.meta !== "undefined" && import.meta.env
+      ? (import.meta.env.VITE_GOOGLE_PAY_MERCHANT_ID ?? null)
+      : null;
 
   const handlePay = useCallback(async () => {
     setProcessing(true);

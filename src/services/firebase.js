@@ -1,58 +1,60 @@
 /**
  * Firebase configuration and service initialization.
  *
- * To activate real Firebase services:
- * 1. Create a project at https://console.firebase.google.com
- * 2. Copy the SDK config object into your .env file (see .env.example)
- * 3. Uncomment the initialization blocks below.
+ * Runs in STUB mode when env vars are absent.
+ * Set all VITE_FIREBASE_* variables in .env to activate real Firebase.
  *
- * Currently runs in STUB mode — all auth and Firestore calls are mocked
- * so the app works fully without a live Firebase project.
+ * See .env.example for required keys and where to get them.
  */
 
-// import { initializeApp } from "firebase/app";
-// import { getAuth, GoogleAuthProvider } from "firebase/auth";
-// import { getFirestore } from "firebase/firestore";
-// import { getAnalytics } from "firebase/analytics";
+import { initializeApp, getApps } from "firebase/app";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY ?? "PLACEHOLDER",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ?? "PLACEHOLDER",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? "PLACEHOLDER",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ?? "PLACEHOLDER",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? "PLACEHOLDER",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID ?? "PLACEHOLDER",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ?? "PLACEHOLDER",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// --- STUB MODE ---
-// Remove this block and uncomment the imports above to activate real Firebase.
+/** Whether real Firebase credentials are present in environment. */
+const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.apiKey !== "undefined");
+
+// Initialise Firebase only once regardless of HMR re-runs
+const app = isFirebaseConfigured && !getApps().length ? initializeApp(firebaseConfig) : (getApps()[0] ?? null);
+
+/** Firebase Auth instance — null in stub mode. */
+export const auth = app ? getAuth(app) : null;
+
+/** Firestore instance — null in stub mode. */
+export const db = app ? getFirestore(app) : null;
+
+/** Google Auth Provider. */
+export const googleProvider = isFirebaseConfigured ? new GoogleAuthProvider() : null;
 
 /**
- * Stub Firebase Auth — simulates sign-in with Google.
- * Replace with real Firebase Auth when credentials are available.
- */
-export const auth = {
-  currentUser: null,
-};
-
-/**
- * Stub Firestore — simulates real-time collection listener.
- * Replace with `getFirestore()` when credentials are available.
- */
-export const db = null;
-
-/**
- * Stub Google Auth Provider.
- */
-export const googleProvider = null;
-
-/**
- * Sign in with Google (stub implementation).
- * @returns {Promise<{user: Object}>} Mock user object.
+ * Signs in with Google using a popup.
+ * Falls back to a stub mock user when Firebase is not configured.
+ * @returns {Promise<{ user: Object }>}
  */
 export async function signInWithGoogle() {
-  // Simulate network latency
+  if (auth && googleProvider) {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      return result;
+    } catch (err) {
+      // USER_CANCELLED — treat gracefully
+      if (err.code === "auth/popup-closed-by-user") return { user: null };
+      throw err;
+    }
+  }
+
+  // ── STUB MODE ──────────────────────────────────────────────────────────────
+  // Returns a mock user so the app works without Firebase credentials.
   await new Promise((resolve) => setTimeout(resolve, 800));
   return {
     user: {
@@ -65,12 +67,15 @@ export async function signInWithGoogle() {
 }
 
 /**
- * Sign out stub.
+ * Signs out the current user.
  * @returns {Promise<void>}
  */
 export async function signOutUser() {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  auth.currentUser = null;
+  if (auth) {
+    await signOut(auth);
+  } else {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  }
 }
 
-export { firebaseConfig };
+export { firebaseConfig, isFirebaseConfigured };
