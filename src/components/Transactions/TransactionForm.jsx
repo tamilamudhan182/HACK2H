@@ -24,9 +24,7 @@ function TransactionForm() {
             <h3>Transaction Form Locked</h3>
           </div>
         </div>
-        <p className="helper-copy">
-          Switch to the Admin role to add or manage transactions.
-        </p>
+        <p className="helper-copy">Switch to the Admin role to add or manage transactions.</p>
       </section>
     );
   }
@@ -89,15 +87,14 @@ function TransactionForm() {
         </label>
         <label>
           <span>Category</span>
-          <select
-            value={form.category}
-            onChange={(event) => setForm({ ...form, category: event.target.value })}
-          >
-            {categoryOptions.filter((option) => option !== "All").map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
+          <select value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })}>
+            {categoryOptions
+              .filter((option) => option !== "All")
+              .map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
           </select>
         </label>
         <label>

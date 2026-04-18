@@ -56,9 +56,7 @@ export function recommendRoute({ destination, zones, priority = "balanced" }) {
 
   const path = orderedZones.slice(0, 3).map((zone) => zone.label);
   const loadAverage =
-    path.length === 0
-      ? 0
-      : orderedZones.slice(0, 3).reduce((sum, zone) => sum + zone.density, 0) / path.length;
+    path.length === 0 ? 0 : orderedZones.slice(0, 3).reduce((sum, zone) => sum + zone.density, 0) / path.length;
   const eta = Math.round(clamp(4 + loadAverage / 25, 4, 12));
   const advisory =
     priority === "safety"
@@ -105,10 +103,7 @@ export function selectRecommendations(catalog, preferences, limit = 3) {
 export function suggestDepartureOption(options, zones) {
   const exitLoad =
     zones.filter((zone) => zone.type === "exit").reduce((sum, zone) => sum + zone.density, 0) /
-    Math.max(
-      zones.filter((zone) => zone.type === "exit").length,
-      1
-    );
+    Math.max(zones.filter((zone) => zone.type === "exit").length, 1);
 
   const rankedOptions = options
     .map((option) => ({

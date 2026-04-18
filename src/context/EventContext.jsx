@@ -1,12 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  useDeferredValue,
-  startTransition
-} from "react";
+import { createContext, useContext, useEffect, useRef, useState, useDeferredValue, startTransition } from "react";
 import {
   attendeeProfile,
   initialAlerts,
@@ -31,6 +23,13 @@ import {
 
 const EventContext = createContext(null);
 
+/**
+ * Helper to prepend a new alert if it is not already in the list.
+ * Maintains a maximum history size of 7 alerts.
+ * @param {Array} currentAlerts - The existing list of alerts.
+ * @param {Object} alert - The new alert object to insert.
+ * @returns {Array} Updated array of alerts.
+ */
 function insertAlert(currentAlerts, alert) {
   if (currentAlerts.some((item) => item.id === alert.id)) {
     return currentAlerts;
@@ -38,6 +37,11 @@ function insertAlert(currentAlerts, alert) {
   return [alert, ...currentAlerts].slice(0, 7);
 }
 
+/**
+ * Formats a timestamp into a 12-hour/24-hour localized string.
+ * @param {number} now - The timestamp to format.
+ * @returns {string} Formatted time string.
+ */
 function formatClock(now) {
   return new Date(now).toLocaleTimeString("en-IN", {
     hour: "2-digit",
@@ -45,6 +49,13 @@ function formatClock(now) {
   });
 }
 
+/**
+ * Context provider that manages globally shared event state, interactions,
+ * simulated real-time backend data, and UI accessibility settings.
+ * @param {Object} props - React component props.
+ * @param {React.ReactNode} props.children - Child nodes wrapped by provider.
+ * @returns {JSX.Element} The Context Provider.
+ */
 export function EventProvider({ children }) {
   const [wallet, setWallet] = useState(initialWallet);
   const [zones, setZones] = useState(initialZones);
@@ -85,7 +96,10 @@ export function EventProvider({ children }) {
           currentQueues.map((queue, index) => ({
             ...queue,
             peopleAhead: clamp(
-              queue.peopleAhead + Math.round((Math.random() - 0.35) * 4) - (queue.joined ? 1 : 0) + (index === 0 ? 1 : 0),
+              queue.peopleAhead +
+                Math.round((Math.random() - 0.35) * 4) -
+                (queue.joined ? 1 : 0) +
+                (index === 0 ? 1 : 0),
               2,
               24
             ),
@@ -138,22 +152,13 @@ export function EventProvider({ children }) {
 
     return {
       ...moment,
-      detail:
-        deltaMinutes > 0
-          ? `Starts in ${deltaMinutes} min`
-          : isLive
-            ? "Happening now"
-            : "Completed",
+      detail: deltaMinutes > 0 ? `Starts in ${deltaMinutes} min` : isLive ? "Happening now" : "Completed",
       status: deltaMinutes > 0 ? `T-${deltaMinutes}` : isLive ? "Live" : "Done",
     };
   });
 
   const transportAdvice = suggestDepartureOption(transportOptions, zones);
-  const recommendations = selectRecommendations(
-    recommendationCatalog,
-    attendeeProfile.preferences,
-    3
-  );
+  const recommendations = selectRecommendations(recommendationCatalog, attendeeProfile.preferences, 3);
   const deferredAlerts = useDeferredValue(alerts);
 
   useEffect(() => {
@@ -361,7 +366,7 @@ export function EventProvider({ children }) {
     addWalletFunds,
     buyPass,
     joinQueue,
-    rewardAction
+    rewardAction,
   };
 
   return <EventContext.Provider value={value}>{children}</EventContext.Provider>;

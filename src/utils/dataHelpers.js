@@ -116,22 +116,13 @@ export function getDefaultState() {
 
 export function getFilteredTransactions(transactions, filters) {
   return transactions
-    .filter((transaction) =>
-      filters.category === "All" ? true : transaction.category === filters.category
-    )
-    .filter((transaction) =>
-      filters.type === "All" ? true : transaction.type === filters.type
-    )
+    .filter((transaction) => (filters.category === "All" ? true : transaction.category === filters.category))
+    .filter((transaction) => (filters.type === "All" ? true : transaction.type === filters.type))
     .filter((transaction) => {
       const query = filters.search.trim().toLowerCase();
       if (!query) return true;
 
-      const haystack = [
-        transaction.description,
-        transaction.category,
-        transaction.account,
-        transaction.type,
-      ]
+      const haystack = [transaction.description, transaction.category, transaction.account, transaction.type]
         .join(" ")
         .toLowerCase();
 
@@ -151,8 +142,7 @@ function buildMonthlyOverview(transactions) {
         day: "numeric",
       });
       const previous = map.get(label) || 0;
-      const signedAmount =
-        transaction.type === "Income" ? transaction.amount : -transaction.amount;
+      const signedAmount = transaction.type === "Income" ? transaction.amount : -transaction.amount;
       map.set(label, previous + signedAmount);
     });
 
@@ -167,8 +157,7 @@ function buildMonthlyOverview(transactions) {
 function buildCategoryTotals(transactions) {
   const expenses = transactions.filter((transaction) => transaction.type === "Expense");
   const totals = expenses.reduce((accumulator, transaction) => {
-    accumulator[transaction.category] =
-      (accumulator[transaction.category] || 0) + transaction.amount;
+    accumulator[transaction.category] = (accumulator[transaction.category] || 0) + transaction.amount;
     return accumulator;
   }, {});
 
@@ -194,9 +183,7 @@ function buildInsights(allTransactions) {
     return accumulator;
   }, {});
 
-  const orderedMonths = Object.entries(monthlyGroups).sort(([a], [b]) =>
-    a.localeCompare(b)
-  );
+  const orderedMonths = Object.entries(monthlyGroups).sort(([a], [b]) => a.localeCompare(b));
   const currentMonth = orderedMonths.at(-1)?.[1] || { income: 0, expense: 0 };
   const previousMonth = orderedMonths.at(-2)?.[1] || { income: 0, expense: 0 };
   const categoryTotals = buildCategoryTotals(allTransactions);
@@ -212,9 +199,7 @@ function buildInsights(allTransactions) {
     savingsRate,
     observations: [
       topCategory
-        ? `${topCategory.category} is your largest expense category at ${formatCurrency(
-            topCategory.amount
-          )}.`
+        ? `${topCategory.category} is your largest expense category at ${formatCurrency(topCategory.amount)}.`
         : "Expenses will appear here once you log spending activity.",
       currentMonth.expense > previousMonth.expense
         ? `Spending is up ${formatCurrency(
@@ -236,8 +221,7 @@ export function summarizeTransactions(allTransactions, visibleTransactions) {
     .filter((transaction) => transaction.type === "Expense")
     .reduce((sum, transaction) => sum + transaction.amount, 0);
   const visibleAmount = visibleTransactions.reduce(
-    (sum, transaction) =>
-      sum + (transaction.type === "Income" ? transaction.amount : -transaction.amount),
+    (sum, transaction) => sum + (transaction.type === "Income" ? transaction.amount : -transaction.amount),
     0
   );
 

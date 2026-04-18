@@ -19,9 +19,7 @@ function InsightsPanel() {
           <span className="insights-grid__label">Top spend</span>
           <strong>
             {insights.topCategory
-              ? `${insights.topCategory.category} · ${formatCurrency(
-                  insights.topCategory.amount
-                )}`
+              ? `${insights.topCategory.category} ï¿½ ${formatCurrency(insights.topCategory.amount)}`
               : "No expense data"}
           </strong>
         </article>

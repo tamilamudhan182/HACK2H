@@ -19,8 +19,8 @@ function DashboardPage() {
           <p className="eyebrow">Financial Dashboard</p>
           <h1>Track balances, spending, and account health from one workspace.</h1>
           <p className="hero__copy">
-            A role-aware finance dashboard with transaction controls, trend visuals,
-            and insight summaries for decision-ready reporting.
+            A role-aware finance dashboard with transaction controls, trend visuals, and insight summaries for
+            decision-ready reporting.
           </p>
         </div>
         <div className="hero__side">
@@ -32,7 +32,7 @@ function DashboardPage() {
           <div className="hero__stat">
             <span>Filtered net</span>
             <strong>
-              {filteredTransactions.length} entries · {summary.visibleAmount >= 0 ? "+" : ""}
+              {filteredTransactions.length} entries ï¿½ {summary.visibleAmount >= 0 ? "+" : ""}
               {formatCurrency(summary.visibleAmount)}
             </strong>
           </div>
@@ -46,18 +46,8 @@ function DashboardPage() {
           tone="balance"
           detail="Income minus tracked expenses"
         />
-        <SummaryCard
-          label="Income"
-          value={summary.income}
-          tone="income"
-          detail="All recorded income streams"
-        />
-        <SummaryCard
-          label="Expenses"
-          value={summary.expenses}
-          tone="expense"
-          detail="Total outgoing cash flow"
-        />
+        <SummaryCard label="Income" value={summary.income} tone="income" detail="All recorded income streams" />
+        <SummaryCard label="Expenses" value={summary.expenses} tone="expense" detail="Total outgoing cash flow" />
         <SummaryCard
           label="Transactions"
           value={summary.totalTransactions.toLocaleString("en-US")}

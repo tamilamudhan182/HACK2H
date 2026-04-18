@@ -13,10 +13,8 @@ function BalanceTrendChart({ data }) {
 
   const points = data
     .map((point, index) => {
-      const x =
-        padding + (index * (width - padding * 2)) / Math.max(data.length - 1, 1);
-      const y =
-        height - padding - ((point.balance - min) / range) * (height - padding * 2);
+      const x = padding + (index * (width - padding * 2)) / Math.max(data.length - 1, 1);
+      const y = height - padding - ((point.balance - min) / range) * (height - padding * 2);
       return `${x},${y}`;
     })
     .join(" ");
@@ -33,12 +31,8 @@ function BalanceTrendChart({ data }) {
       <svg className="line-chart" viewBox={`0 0 ${width} ${height}`} role="img">
         <polyline fill="none" stroke="#125a3e" strokeWidth="4" points={points} />
         {data.map((point, index) => {
-          const x =
-            padding + (index * (width - padding * 2)) / Math.max(data.length - 1, 1);
-          const y =
-            height -
-            padding -
-            ((point.balance - min) / range) * (height - padding * 2);
+          const x = padding + (index * (width - padding * 2)) / Math.max(data.length - 1, 1);
+          const y = height - padding - ((point.balance - min) / range) * (height - padding * 2);
 
           return (
             <g key={point.label}>

@@ -2,7 +2,7 @@ export const attendeeProfile = {
   id: "attendee-27",
   name: "Aarav Mehta",
   venueId: "stadium-neo",
-  seatLabel: "Block A · Row 12 · Seat 08",
+  seatLabel: "Block A ï¿½ Row 12 ï¿½ Seat 08",
   groupName: "Weekend Crew",
   preferences: ["vegetarian", "spicy", "retro", "sustainable"],
 };

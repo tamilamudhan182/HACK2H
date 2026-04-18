@@ -15,10 +15,7 @@ function FilterBar() {
       <div className="filter-grid">
         <label>
           <span>Category</span>
-          <select
-            value={filters.category}
-            onChange={(event) => setFilters({ category: event.target.value })}
-          >
+          <select value={filters.category} onChange={(event) => setFilters({ category: event.target.value })}>
             {categoryOptions.map((option) => (
               <option key={option} value={option}>
                 {option}
@@ -28,10 +25,7 @@ function FilterBar() {
         </label>
         <label>
           <span>Type</span>
-          <select
-            value={filters.type}
-            onChange={(event) => setFilters({ type: event.target.value })}
-          >
+          <select value={filters.type} onChange={(event) => setFilters({ type: event.target.value })}>
             {typeOptions.map((option) => (
               <option key={option} value={option}>
                 {option}

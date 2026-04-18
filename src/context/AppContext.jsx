@@ -27,17 +27,13 @@ function reducer(state, action) {
       return {
         ...state,
         transactions: state.transactions.map((transaction) =>
-          transaction.id === action.payload.id
-            ? { ...transaction, ...action.payload }
-            : transaction
+          transaction.id === action.payload.id ? { ...transaction, ...action.payload } : transaction
         ),
       };
     case ACTIONS.DELETE_TRANSACTION:
       return {
         ...state,
-        transactions: state.transactions.filter(
-          (transaction) => transaction.id !== action.payload
-        ),
+        transactions: state.transactions.filter((transaction) => transaction.id !== action.payload),
       };
     case ACTIONS.SET_FILTERS:
       return {
@@ -79,14 +75,10 @@ export function AppProvider({ children }) {
       ...state,
       filteredTransactions,
       summary,
-      addTransaction: (transaction) =>
-        dispatch({ type: ACTIONS.ADD_TRANSACTION, payload: transaction }),
-      editTransaction: (transaction) =>
-        dispatch({ type: ACTIONS.UPDATE_TRANSACTION, payload: transaction }),
-      deleteTransaction: (id) =>
-        dispatch({ type: ACTIONS.DELETE_TRANSACTION, payload: id }),
-      setFilters: (filters) =>
-        dispatch({ type: ACTIONS.SET_FILTERS, payload: filters }),
+      addTransaction: (transaction) => dispatch({ type: ACTIONS.ADD_TRANSACTION, payload: transaction }),
+      editTransaction: (transaction) => dispatch({ type: ACTIONS.UPDATE_TRANSACTION, payload: transaction }),
+      deleteTransaction: (id) => dispatch({ type: ACTIONS.DELETE_TRANSACTION, payload: id }),
+      setFilters: (filters) => dispatch({ type: ACTIONS.SET_FILTERS, payload: filters }),
       setRole: (role) => dispatch({ type: ACTIONS.SET_ROLE, payload: role }),
     }),
     [state, filteredTransactions, summary]

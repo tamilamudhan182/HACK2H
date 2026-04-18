@@ -49,14 +49,11 @@ function SpendingBreakdownChart({ data }) {
         <div className="legend">
           {segments.map((segment) => (
             <div key={segment.category} className="legend__item">
-              <span
-                className="legend__swatch"
-                style={{ backgroundColor: segment.color }}
-              />
+              <span className="legend__swatch" style={{ backgroundColor: segment.color }} />
               <div>
                 <strong>{segment.category}</strong>
                 <p>
-                  {formatCurrency(segment.amount)} • {Math.round((segment.amount / total) * 100)}%
+                  {formatCurrency(segment.amount)} ï¿½ {Math.round((segment.amount / total) * 100)}%
                 </p>
               </div>
             </div>

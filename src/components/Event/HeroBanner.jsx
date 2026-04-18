@@ -8,8 +8,8 @@ function HeroBanner({ attendee, stats, headline }) {
         </div>
         <h1>Navigate the venue, skip the chaos, and keep every scan in one QR wallet.</h1>
         <p>
-          Unified access, crowd-aware routing, virtual queueing, group coordination,
-          emergency guidance, and post-match transport all update live for {attendee.name}.
+          Unified access, crowd-aware routing, virtual queueing, group coordination, emergency guidance, and post-match
+          transport all update live for {attendee.name}.
         </p>
         <div className="hero-panel__chips">
           <span className="chip">Seat {attendee.seatLabel}</span>

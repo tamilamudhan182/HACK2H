@@ -1,5 +1,3 @@
-import assert from "node:assert/strict";
-import test from "node:test";
 import {
   buildAiAlert,
   buildQrToken,
@@ -19,7 +17,7 @@ test("predictWaitMinutes grows with crowd density", () => {
   const relaxed = predictWaitMinutes(queue, 35);
   const busy = predictWaitMinutes(queue, 90);
 
-  assert.ok(busy > relaxed);
+  expect(busy).toBeGreaterThan(relaxed);
 });
 
 test("recommendRoute prioritizes lower-risk exits in safety mode", () => {
@@ -35,7 +33,7 @@ test("recommendRoute prioritizes lower-risk exits in safety mode", () => {
     priority: "safety",
   });
 
-  assert.equal(route.path[0], "Exit Gate C");
+  expect(route.path[0]).toBe("Exit Gate C");
 });
 
 test("buildAiAlert escalates emergency messaging", () => {
@@ -46,16 +44,16 @@ test("buildAiAlert escalates emergency messaging", () => {
     emergency: true,
   });
 
-  assert.match(alert, /Emergency routing active/i);
-  assert.match(alert, /Exit Gate C/i);
+  expect(alert).toMatch(/Emergency routing active/i);
+  expect(alert).toMatch(/Exit Gate C/i);
 });
 
 test("wallet activity prepends latest item", () => {
   const history = [{ id: "old", label: "Old item" }];
   const updated = createWalletActivity(history, { id: "new", label: "New item" });
 
-  assert.equal(updated[0].id, "new");
-  assert.equal(updated.length, 2);
+  expect(updated[0].id).toBe("new");
+  expect(updated.length).toBe(2);
 });
 
 test("QR token generation is stable for identical payloads", () => {
@@ -70,7 +68,7 @@ test("QR token generation is stable for identical payloads", () => {
     channel: "multi",
   });
 
-  assert.equal(first, second);
+  expect(first).toBe(second);
 });
 
 test("recommendations favor matching user preferences", () => {
@@ -83,5 +81,5 @@ test("recommendations favor matching user preferences", () => {
     1
   );
 
-  assert.equal(recommendations[0].id, "1");
+  expect(recommendations[0].id).toBe("1");
 });

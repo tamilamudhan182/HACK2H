@@ -76,19 +76,13 @@ function TransactionTable() {
                   <td>{transaction.account}</td>
                   <td>{formatCurrency(transaction.amount)}</td>
                   <td>
-                    <span
-                      className={`status-pill status-pill--${transaction.type.toLowerCase()}`}
-                    >
+                    <span className={`status-pill status-pill--${transaction.type.toLowerCase()}`}>
                       {transaction.type}
                     </span>
                   </td>
                   {role === "Admin" ? (
                     <td>
-                      <button
-                        type="button"
-                        className="danger-button"
-                        onClick={() => deleteTransaction(transaction.id)}
-                      >
+                      <button type="button" className="danger-button" onClick={() => deleteTransaction(transaction.id)}>
                         Delete
                       </button>
                     </td>

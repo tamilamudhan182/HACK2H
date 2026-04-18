@@ -6,7 +6,10 @@ function AlertsPage() {
   const { deferredAlerts, wallet, sustainabilityActions, rewardAction, recommendations } = useEvent();
 
   return (
-    <div className="page-grid page-grid--top" style={{ paddingBottom: "80px", padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
+    <div
+      className="page-grid page-grid--top"
+      style={{ paddingBottom: "80px", padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}
+    >
       <NotificationRail alerts={deferredAlerts} />
       <EngagementPanel
         rewardPoints={wallet.rewardPoints}
