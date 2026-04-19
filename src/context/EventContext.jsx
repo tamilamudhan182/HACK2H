@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, useDeferredValue, startTransition } from "react";
+import { sanitizeAmount, sanitizeText, validateQueueId, buildAuditEntry } from "../utils/sanitize";
+import { checkRateLimit, formatRetryMessage } from "../utils/rateLimit";
 import {
   attendeeProfile,
   initialAlerts,
@@ -235,25 +237,41 @@ export function EventProvider({ children }) {
   }
 
   function addWalletFunds(channel, amount) {
+    // Rate limit: max 3 top-ups per 10 seconds
+    const { allowed, retryAfterMs } = checkRateLimit("wallet_topup", 3, 10_000);
+    if (!allowed) {
+      console.warn("[RateLimit]", formatRetryMessage(retryAfterMs));
+      return;
+    }
+
+    // Sanitize inputs
+    const safeChannel = sanitizeText(channel);
+    const safeAmount = sanitizeAmount(amount, 1, 10_000);
+    if (!safeChannel || safeAmount === null) {
+      console.warn("[Security] addWalletFunds: invalid input", { channel, amount });
+      return;
+    }
+
+    console.info("[Audit]", buildAuditEntry("wallet_topup", { channel: safeChannel, amount: safeAmount }));
     const timestamp = formatClock(Date.now());
     setWallet((currentWallet) => ({
       ...currentWallet,
-      balance: currentWallet.balance + amount,
+      balance: currentWallet.balance + safeAmount,
       history: createWalletActivity(currentWallet.history, {
         id: `wallet-${Date.now()}`,
-        label: `Wallet top-up via ${channel}`,
-        amount,
+        label: `Wallet top-up via ${safeChannel}`,
+        amount: safeAmount,
         type: "credit",
-        channel,
+        channel: safeChannel,
         timestamp,
       }),
     }));
     setAlerts((currentAlerts) =>
       insertAlert(currentAlerts, {
-        id: `wallet-top-up-${channel}-${amount}`,
+        id: `wallet-top-up-${safeChannel}-${safeAmount}`,
         tone: "info",
         title: "Balance updated",
-        message: `${channel} top-up successful. Your wallet is ready for faster QR payments.`,
+        message: `${safeChannel} top-up successful. Your wallet is ready for faster QR payments.`,
         timestamp,
       })
     );
@@ -298,6 +316,20 @@ export function EventProvider({ children }) {
   }
 
   function joinQueue(queueId) {
+    // Validate queue ID format (whitelist: alphanumeric + dash)
+    if (!validateQueueId(queueId)) {
+      console.warn("[Security] joinQueue: invalid queueId", queueId);
+      return;
+    }
+
+    // Rate limit: max 4 queue joins per 15 seconds
+    const { allowed, retryAfterMs } = checkRateLimit("queue_join", 4, 15_000);
+    if (!allowed) {
+      console.warn("[RateLimit]", formatRetryMessage(retryAfterMs));
+      return;
+    }
+
+    console.info("[Audit]", buildAuditEntry("queue_join", { queueId }));
     const timestamp = formatClock(Date.now());
     setQueues((currentQueues) =>
       currentQueues.map((queue) =>
@@ -324,17 +356,33 @@ export function EventProvider({ children }) {
   }
 
   function rewardAction(action) {
+    // Rate limit: max 5 reward logs per 30 seconds
+    const { allowed, retryAfterMs } = checkRateLimit("reward_action", 5, 30_000);
+    if (!allowed) {
+      console.warn("[RateLimit]", formatRetryMessage(retryAfterMs));
+      return;
+    }
+
+    // Sanitize label before storing
+    const safeLabel = sanitizeText(action.label);
+    const safePoints = sanitizeAmount(action.points, 1, 500);
+    if (!safeLabel || safePoints === null) {
+      console.warn("[Security] rewardAction: invalid action", action);
+      return;
+    }
+
+    console.info("[Audit]", buildAuditEntry("reward_action", { id: action.id, points: safePoints }));
     const timestamp = formatClock(Date.now());
     setWallet((currentWallet) => ({
       ...currentWallet,
-      rewardPoints: currentWallet.rewardPoints + action.points,
+      rewardPoints: currentWallet.rewardPoints + safePoints,
     }));
     setAlerts((currentAlerts) =>
       insertAlert(currentAlerts, {
         id: `reward-${action.id}-${Date.now()}`,
         tone: "info",
         title: "Reward captured",
-        message: `${action.label} logged. ${action.points} eco points added to your profile.`,
+        message: `${safeLabel} logged. ${safePoints} eco points added to your profile.`,
         timestamp,
       })
     );
