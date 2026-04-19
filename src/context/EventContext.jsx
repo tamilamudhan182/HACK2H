@@ -1,6 +1,8 @@
-import { createContext, useContext, useEffect, useRef, useState, useDeferredValue, startTransition } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useDeferredValue, startTransition } from "react";
 import { sanitizeAmount, sanitizeText, validateQueueId, buildAuditEntry } from "../utils/sanitize";
 import { checkRateLimit, formatRetryMessage } from "../utils/rateLimit";
+import { useTimeline } from "../hooks/useTimeline";
+import { useTransport } from "../hooks/useTransport";
 import {
   attendeeProfile,
   initialAlerts,
@@ -129,37 +131,20 @@ export function EventProvider({ children }) {
     };
   });
 
-  const routeDestinationMap = {
-    seat: attendeeProfile.seatLabel,
-    restroom: "Restroom Cluster D",
-    exit: "Exit Gate C",
-  };
-
-  const liveRoute = recommendRoute({
-    destination: routeDestinationMap[activeDestination],
-    zones,
-    priority: activeDestination === "exit" ? "safety" : "balanced",
-  });
-
   const selectedFriend = friends.find((friend) => friend.id === selectedFriendId) ?? friends[0];
-  const meetupRoute = recommendRoute({
-    destination: `meet ${selectedFriend.name}`,
+
+  // Extracted hooks: timeline enrichment and transport advice
+  const timeline = useTimeline(timelineMoments, kickoffTime, liveNow);
+  const { liveRoute, meetupRoute, transportAdvice } = useTransport({
+    transportOptions,
     zones,
-    priority: "balanced",
+    activeDestination,
+    selectedFriendName: selectedFriend.name,
+    recommendRoute,
+    suggestDepartureOption,
+    attendeeProfile,
   });
 
-  const timeline = timelineMoments.map((moment) => {
-    const deltaMinutes = Math.round((kickoffTime - liveNow) / 60000) + (moment.offsetMinutes - 18);
-    const isLive = deltaMinutes <= 0 && deltaMinutes > -20;
-
-    return {
-      ...moment,
-      detail: deltaMinutes > 0 ? `Starts in ${deltaMinutes} min` : isLive ? "Happening now" : "Completed",
-      status: deltaMinutes > 0 ? `T-${deltaMinutes}` : isLive ? "Live" : "Done",
-    };
-  });
-
-  const transportAdvice = suggestDepartureOption(transportOptions, zones);
   const recommendations = selectRecommendations(recommendationCatalog, attendeeProfile.preferences, 3);
   const deferredAlerts = useDeferredValue(alerts);
 

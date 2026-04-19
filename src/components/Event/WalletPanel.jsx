@@ -137,15 +137,13 @@ const WalletPanel = memo(function WalletPanel({ attendee, wallet, settings, onAd
 
       {/* Transaction History */}
       <h3 style={{ marginTop: "var(--spacing-3)" }}>Recent Activity</h3>
-      <section
-        role="list"
+      <ul
         aria-label="Recent wallet transactions"
-        style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-2)" }}
+        style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-2)", listStyle: "none", padding: 0, margin: 0 }}
       >
         {wallet.history.map((tx) => (
-          <div
+          <li
             key={tx.id}
-            role="listitem"
             aria-label={`${tx.label}, ${tx.type === "credit" ? "credited" : "debited"} ${Math.abs(tx.amount)} rupees at ${tx.timestamp}`}
             className="panel-card"
             style={{
@@ -169,9 +167,9 @@ const WalletPanel = memo(function WalletPanel({ attendee, wallet, settings, onAd
             >
               {tx.type === "credit" ? "+" : "-"}INR {Math.abs(tx.amount)}
             </strong>
-          </div>
+          </li>
         ))}
-      </section>
+      </ul>
 
       {/* Accessibility Settings */}
       <h3 style={{ marginTop: "var(--spacing-3)" }}>Settings</h3>

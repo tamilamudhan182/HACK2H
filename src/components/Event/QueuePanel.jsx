@@ -14,19 +14,20 @@ const QueuePanel = memo(function QueuePanel({ queues, onJoinQueue }) {
         Book your spot for food and merch and strictly avoid the lines.
       </p>
 
-      <section
-        role="list"
+      <ul
         aria-label="Available virtual queues"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
           gap: "var(--spacing-4)",
+          listStyle: "none",
+          padding: 0,
+          margin: 0,
         }}
       >
         {queues.map((queue) => (
-          <div
+          <li
             key={queue.id}
-            role="listitem"
             aria-label={`${queue.label} queue — ${queue.joined ? "Joined" : "Available"}`}
             className="panel-card"
             style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-3)" }}
@@ -127,9 +128,9 @@ const QueuePanel = memo(function QueuePanel({ queues, onJoinQueue }) {
                 Join Queue
               </button>
             )}
-          </div>
+          </li>
         ))}
-      </section>
+      </ul>
     </div>
   );
 });

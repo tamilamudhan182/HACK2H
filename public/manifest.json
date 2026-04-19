@@ -1,0 +1,16 @@
+{
+  "name": "Smart Event Companion",
+  "short_name": "EventApp",
+  "description": "AI-powered smart event companion with real-time crowd flow, QR wallet, and personalised alerts.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#ffd700",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
