@@ -10,6 +10,7 @@ module.exports = {
   globals: {
     "import.meta": { env: {} }
   },
+  testPathIgnorePatterns: ["/node_modules/", "/tests/e2e/"],
   transformIgnorePatterns: ["node_modules/(?!(your-esm-package)/)"],
   collectCoverageFrom: [
     "src/utils/**/*.{js,jsx}",
