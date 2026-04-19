@@ -9,18 +9,17 @@ function SpendingBreakdownChart({ data }) {
     return <div className="empty-chart">No expense categories available.</div>;
   }
 
-  let cumulativePercent = 0;
-  const segments = data.map((item, index) => {
+  const segments = data.reduce((acc, item, index) => {
+    const start = acc.length > 0 ? acc[acc.length - 1].end : 0;
     const percent = item.amount / total;
-    const start = cumulativePercent;
-    cumulativePercent += percent;
-    return {
+    acc.push({
       ...item,
       color: chartColors[index % chartColors.length],
       start,
-      end: cumulativePercent,
-    };
-  });
+      end: start + percent,
+    });
+    return acc;
+  }, []);
 
   return (
     <section className="panel">

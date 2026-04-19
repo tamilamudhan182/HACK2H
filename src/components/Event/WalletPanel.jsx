@@ -139,7 +139,14 @@ const WalletPanel = memo(function WalletPanel({ attendee, wallet, settings, onAd
       <h3 style={{ marginTop: "var(--spacing-3)" }}>Recent Activity</h3>
       <ul
         aria-label="Recent wallet transactions"
-        style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-2)", listStyle: "none", padding: 0, margin: 0 }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--spacing-2)",
+          listStyle: "none",
+          padding: 0,
+          margin: 0,
+        }}
       >
         {wallet.history.map((tx) => (
           <li

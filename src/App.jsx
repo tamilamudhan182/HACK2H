@@ -4,7 +4,6 @@ import { EventProvider, useEvent } from "./context/EventContext";
 import { AuthProvider } from "./context/AuthContext";
 import AuthGuard from "./components/AuthGuard";
 import Navigation from "./components/Navigation";
-import DemoModeBanner from "./components/DemoModeBanner";
 import { trackPageView } from "./services/analytics";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -62,7 +61,6 @@ function App() {
     <AuthProvider>
       <EventProvider>
         <BrowserRouter>
-          <DemoModeBanner />
           {/* Skip-to-content link for keyboard users */}
           <a
             href="#main-content"

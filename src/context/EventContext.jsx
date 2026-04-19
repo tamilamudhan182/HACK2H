@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, useDeferredValue, startTransition } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useDeferredValue,
+  startTransition,
+} from "react";
 import { sanitizeAmount, sanitizeText, validateQueueId, buildAuditEntry } from "../utils/sanitize";
 import { checkRateLimit, formatRetryMessage } from "../utils/rateLimit";
 import { useTimeline } from "../hooks/useTimeline";
@@ -73,7 +81,7 @@ export function EventProvider({ children }) {
   });
   const [selectedFriendId, setSelectedFriendId] = useState(initialFriends[0].id);
   const [activeDestination, setActiveDestination] = useState("seat");
-  const [liveNow, setLiveNow] = useState(Date.now());
+  const [liveNow, setLiveNow] = useState(() => Date.now());
   const [kickoffTime] = useState(() => Date.now() + 18 * 60 * 1000);
   const lastSpokenAlertId = useRef("");
 
@@ -155,50 +163,62 @@ export function EventProvider({ children }) {
     if (busiestZone.density < 82) return;
     const emergency = busiestZone.type === "exit" && busiestZone.density >= 88;
 
-    setAlerts((currentAlerts) =>
-      insertAlert(currentAlerts, {
-        id: `crowd-${busiestZone.id}-${emergency ? "urgent" : "warn"}`,
-        tone: emergency ? "urgent" : "warning",
-        title: emergency ? "Emergency reroute" : "Congestion advisory",
-        message: buildAiAlert({
-          zoneName: busiestZone.label,
-          density: busiestZone.density,
-          alternateZone: safestZone.label,
-          emergency,
-        }),
-        timestamp: formatClock(Date.now()),
-      })
-    );
+    const timer = setTimeout(() => {
+      setAlerts((currentAlerts) =>
+        insertAlert(currentAlerts, {
+          id: `crowd-${busiestZone.id}-${emergency ? "urgent" : "warn"}`,
+          tone: emergency ? "urgent" : "warning",
+          title: emergency ? "Emergency reroute" : "Congestion advisory",
+          message: buildAiAlert({
+            zoneName: busiestZone.label,
+            density: busiestZone.density,
+            alternateZone: safestZone.label,
+            emergency,
+          }),
+          timestamp: formatClock(Date.now()),
+        })
+      );
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [zones]);
 
   useEffect(() => {
     const readyQueue = liveQueues.find((queue) => queue.joined && queue.predictedWait <= 5);
     if (!readyQueue) return;
 
-    setAlerts((currentAlerts) =>
-      insertAlert(currentAlerts, {
-        id: `queue-ready-${readyQueue.id}`,
-        tone: "info",
-        title: `${readyQueue.label} is ready`,
-        message: `Your ${readyQueue.type.toLowerCase()} slot is almost up. Head over now for queue token ${readyQueue.token}.`,
-        timestamp: formatClock(Date.now()),
-      })
-    );
+    const timer = setTimeout(() => {
+      setAlerts((currentAlerts) =>
+        insertAlert(currentAlerts, {
+          id: `queue-ready-${readyQueue.id}`,
+          tone: "info",
+          title: `${readyQueue.label} is ready`,
+          message: `Your ${readyQueue.type.toLowerCase()} slot is almost up. Head over now for queue token ${readyQueue.token}.`,
+          timestamp: formatClock(Date.now()),
+        })
+      );
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [liveQueues]);
 
   useEffect(() => {
     const upcomingMoment = timeline.find((item) => item.status.startsWith("T-") && Number(item.status.slice(2)) <= 10);
     if (!upcomingMoment) return;
 
-    setAlerts((currentAlerts) =>
-      insertAlert(currentAlerts, {
-        id: `timeline-${upcomingMoment.id}`,
-        tone: upcomingMoment.tone,
-        title: `${upcomingMoment.label} soon`,
-        message: `${upcomingMoment.label} begins in less than 10 minutes. Wrap up food pickups and move toward your seat.`,
-        timestamp: formatClock(Date.now()),
-      })
-    );
+    const timer = setTimeout(() => {
+      setAlerts((currentAlerts) =>
+        insertAlert(currentAlerts, {
+          id: `timeline-${upcomingMoment.id}`,
+          tone: upcomingMoment.tone,
+          title: `${upcomingMoment.label} soon`,
+          message: `${upcomingMoment.label} begins in less than 10 minutes. Wrap up food pickups and move toward your seat.`,
+          timestamp: formatClock(Date.now()),
+        })
+      );
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, [timeline]);
 
   useEffect(() => {

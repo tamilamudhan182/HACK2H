@@ -11,7 +11,11 @@ import { validateEnv, SERVICE_STATUS } from "../utils/envValidator";
 
 const STATUS_CONFIG = {
   firebase: { label: "Firebase Auth + Firestore", icon: "🔥", docs: "https://console.firebase.google.com" },
-  maps: { label: "Google Maps", icon: "🗺️", docs: "https://console.cloud.google.com/apis/library/maps-backend.googleapis.com" },
+  maps: {
+    label: "Google Maps",
+    icon: "🗺️",
+    docs: "https://console.cloud.google.com/apis/library/maps-backend.googleapis.com",
+  },
   pay: { label: "Google Pay", icon: "💳", docs: "https://pay.google.com/business/console" },
   analytics: { label: "Google Analytics", icon: "📊", docs: "https://analytics.google.com" },
 };
@@ -23,12 +27,8 @@ const DemoModeBanner = memo(function DemoModeBanner() {
   // Only show when at least one service is in demo mode
   if (status.allLive || dismissed) return null;
 
-  const demoServices = Object.entries(STATUS_CONFIG).filter(
-    ([key]) => status[key] === SERVICE_STATUS.DEMO
-  );
-  const liveServices = Object.entries(STATUS_CONFIG).filter(
-    ([key]) => status[key] === SERVICE_STATUS.LIVE
-  );
+  const demoServices = Object.entries(STATUS_CONFIG).filter(([key]) => status[key] === SERVICE_STATUS.DEMO);
+  const liveServices = Object.entries(STATUS_CONFIG).filter(([key]) => status[key] === SERVICE_STATUS.LIVE);
 
   return (
     <div
@@ -91,7 +91,8 @@ const DemoModeBanner = memo(function DemoModeBanner() {
           </>
         )}
         <span style={{ fontWeight: 400, marginLeft: 4 }}>
-          → Add keys to <code style={{ background: "rgba(0,0,0,0.1)", padding: "1px 4px", borderRadius: 3 }}>.env</code> to go live.
+          → Add keys to <code style={{ background: "rgba(0,0,0,0.1)", padding: "1px 4px", borderRadius: 3 }}>.env</code>{" "}
+          to go live.
         </span>
       </div>
       <button

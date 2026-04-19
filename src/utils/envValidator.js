@@ -19,12 +19,7 @@ export const SERVICE_STATUS = {
  * Names of required Vite env vars per Google service.
  */
 const REQUIRED_KEYS = {
-  firebase: [
-    "VITE_FIREBASE_API_KEY",
-    "VITE_FIREBASE_AUTH_DOMAIN",
-    "VITE_FIREBASE_PROJECT_ID",
-    "VITE_FIREBASE_APP_ID",
-  ],
+  firebase: ["VITE_FIREBASE_API_KEY", "VITE_FIREBASE_AUTH_DOMAIN", "VITE_FIREBASE_PROJECT_ID", "VITE_FIREBASE_APP_ID"],
   maps: ["VITE_GOOGLE_MAPS_API_KEY"],
   pay: ["VITE_GOOGLE_PAY_MERCHANT_ID"],
   analytics: ["VITE_GA_MEASUREMENT_ID"],

@@ -16,8 +16,7 @@ export function useTimeline(timelineMoments, kickoffTime, liveNow) {
 
     return {
       ...moment,
-      detail:
-        deltaMinutes > 0 ? `Starts in ${deltaMinutes} min` : isLive ? "Happening now" : "Completed",
+      detail: deltaMinutes > 0 ? `Starts in ${deltaMinutes} min` : isLive ? "Happening now" : "Completed",
       status: deltaMinutes > 0 ? `T-${deltaMinutes}` : isLive ? "Live" : "Done",
     };
   });

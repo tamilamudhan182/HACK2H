@@ -34,13 +34,18 @@ export function useSecureQr({ userId, venueId, channel }) {
   }
 
   useEffect(() => {
-    setLoading(true);
-    rotate().finally(() => setLoading(false));
+    const timer = setTimeout(() => {
+      setLoading(true);
+      rotate().finally(() => setLoading(false));
+    }, 0);
 
     // Rotate key every 5 minutes
     intervalRef.current = setInterval(rotate, KEY_ROTATION_MS);
 
-    return () => clearInterval(intervalRef.current);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(intervalRef.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, venueId, channel]);
 
